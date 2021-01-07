@@ -346,346 +346,348 @@ describe('walk-manifest', function() {
         });
     });
 
-    it('should return just segments for m3u8 with sub playlists', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+    describe('withSubPlaylists', function() {
+      it('should return just segments for m3u8 with sub playlists', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+        const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
 
-      return walker(options)
-        .then(function(resources) {
-          const counts = countResources({resources});
+        return walker(options)
+          .then(function(resources) {
+            const counts = countResources({resources});
 
-          assert.deepEqual(counts, {
-            m3u8: 4,
-            ts: 24,
-            total: 28
+            assert.deepEqual(counts, {
+              m3u8: 4,
+              ts: 24,
+              total: 28
+            });
           });
-        });
-    });
+      });
 
-    it('should return just segments for m3u8 with sub playlists with a redirect', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .reply(302, undefined, {location: TEST_URL + '/redirect.m3u8'})
-        .get('/redirect.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should return just segments for m3u8 with sub playlists with a redirect', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .reply(302, undefined, {location: TEST_URL + '/redirect.m3u8'})
+          .get('/redirect.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+        const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
 
-      return walker(options)
-        .then(function(resources) {
-          const counts = countResources({resources});
+        return walker(options)
+          .then(function(resources) {
+            const counts = countResources({resources});
 
-          assert.deepEqual(counts, {
-            m3u8: 4,
-            ts: 24,
-            total: 28
+            assert.deepEqual(counts, {
+              m3u8: 4,
+              ts: 24,
+              total: 28
+            });
           });
-        });
-    });
+      });
 
-    it('should for one sub playlist getting 404 should get top level 404 error on default onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .reply(404)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should for one sub playlist getting 404 should get top level 404 error on default onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .reply(404)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+        const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
 
-      return walker(options)
-        .catch(function(err) {
-          assert.equal(err.message, '404|' + TEST_URL + '/var256000/playlist.m3u8');
-        });
-    });
-
-    it('should for one sub playlist getting 404 get 404 error but the rest of valid resources on custom onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .reply(404)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
-
-      const errors = [];
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        onError: customError(errors),
-        requestRetryMaxAttempts: 0
-      };
-
-      return walker(options)
-        .then(function(resources) {
-          const counts = countResources({resources});
-
-          assert.deepEqual(counts, {
-            m3u8: 3,
-            ts: 16,
-            total: 19
+        return walker(options)
+          .catch(function(err) {
+            assert.equal(err.message, '404|' + TEST_URL + '/var256000/playlist.m3u8');
           });
+      });
 
-          resources.forEach(function(item) {
-            // We shouldn't get the bad manifest
-            assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+      it('should for one sub playlist getting 404 get 404 error but the rest of valid resources on custom onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .reply(404)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+
+        const errors = [];
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          onError: customError(errors),
+          requestRetryMaxAttempts: 0
+        };
+
+        return walker(options)
+          .then(function(resources) {
+            const counts = countResources({resources});
+
+            assert.deepEqual(counts, {
+              m3u8: 3,
+              ts: 16,
+              total: 19
+            });
+
+            resources.forEach(function(item) {
+              // We shouldn't get the bad manifest
+              assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+            });
           });
-        });
-    });
+      });
 
-    it('should for one sub playlist getting 500 should get top level 500 error on default onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .reply(500)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should for one sub playlist getting 500 should get top level 500 error on default onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .reply(500)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        requestRetryMaxAttempts: 0
-      };
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          requestRetryMaxAttempts: 0
+        };
 
-      return walker(options)
-        .catch(function(err) {
-          assert.equal(err.message, '500|' + TEST_URL + '/var256000/playlist.m3u8');
-        });
-    });
-
-    it('should for one sub playlist getting 500 should get top level 500 error on default onError and with even on 2 retry', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .times(2)
-        .reply(500)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
-
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        requestRetryMaxAttempts: 2,
-        requestRetryDelay: 10
-      };
-
-      return walker(options)
-        .catch(function(err) {
-          assert.equal(err.message, '500|' + TEST_URL + '/var256000/playlist.m3u8');
-        });
-    });
-
-    it('should for one sub playlist getting 500 get 500 error but the rest of valid resources on custom onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .reply(500)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
-
-      const errors = [];
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        onError: customError(errors),
-        requestRetryMaxAttempts: 0
-      };
-
-      return walker(options)
-        .then(function(resources) {
-          // 3 m3u8 and 8 * 2 segments
-          const setResources = new Set(resources);
-
-          assert.equal(setResources.size, 19);
-
-          assert(errors.find(o => o.message === '500|' + TEST_URL + '/var256000/playlist.m3u8'));
-          resources.forEach(function(item) {
-            assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
-            // We shouldn't get the bad manifest
-            assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+        return walker(options)
+          .catch(function(err) {
+            assert.equal(err.message, '500|' + TEST_URL + '/var256000/playlist.m3u8');
           });
-        });
-    });
+      });
 
-    it('should for one sub playlist throwing error should get top level error default onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithError('something awful happened')
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should for one sub playlist getting 500 should get top level 500 error on default onError and with even on 2 retry', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .times(2)
+          .reply(500)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          requestRetryMaxAttempts: 2,
+          requestRetryDelay: 10
+        };
 
-      return walker(options)
-        .catch(function(err) {
-          assert.equal(err.message, 'something awful happened|' + TEST_URL + '/var256000/playlist.m3u8');
-        });
-    });
-
-    it('should for one sub playlist throwing error should get error but have rest of valid segments/manifests default onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithError('something awful happened')
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
-
-      const errors = [];
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        onError: customError(errors),
-        requestRetryMaxAttempts: 0
-      };
-
-      return walker(options)
-        .then(function(resources) {
-          // 3 m3u8 and 8 * 2 segments
-          const setResources = new Set(resources);
-
-          assert.equal(setResources.size, 19);
-
-          assert(errors.find(o => o.message === 'something awful happened|' + TEST_URL + '/var256000/playlist.m3u8'));
-          resources.forEach(function(item) {
-            assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
-            assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+        return walker(options)
+          .catch(function(err) {
+            assert.equal(err.message, '500|' + TEST_URL + '/var256000/playlist.m3u8');
           });
-        });
-    });
+      });
 
-    it('should not break if sub playlist is not a valid m3u8', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .reply(200, 'not valid m3u8')
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should for one sub playlist getting 500 get 500 error but the rest of valid resources on custom onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .reply(500)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+        const errors = [];
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          onError: customError(errors),
+          requestRetryMaxAttempts: 0
+        };
 
-      return walker(options)
-        .then(function(resources) {
-          // 4 m3u8 and 8 * 2 segments
-          const setResources = new Set(resources);
+        return walker(options)
+          .then(function(resources) {
+            // 3 m3u8 and 8 * 2 segments
+            const setResources = new Set(resources);
 
-          assert.equal(setResources.size, 20);
-          setResources.forEach(function(item) {
-            assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
+            assert.equal(setResources.size, 19);
+
+            assert(errors.find(o => o.message === '500|' + TEST_URL + '/var256000/playlist.m3u8'));
+            resources.forEach(function(item) {
+              assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
+              // We shouldn't get the bad manifest
+              assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+            });
           });
-          // We should still get the invalid m3u8
-          assert(resources.filter(e => e.uri === TEST_URL + '/var256000/playlist.m3u8').length > 0);
-        });
-    });
+      });
 
-    it('should throw top level error if sub playlist takes too long to respond with m3u8 default onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .delayConnection(100)
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      it('should for one sub playlist throwing error should get top level error default onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithError('something awful happened')
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
 
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        requestRetryMaxAttempts: 0,
-        requestTimeout: 10,
-        requestRetryDelay: 10
-      };
+        const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
 
-      return walker(options)
-        .catch(function(err) {
-          assert.equal(err.message, 'ESOCKETTIMEDOUT|' + TEST_URL + '/var500000/playlist.m3u8');
-        });
-    });
-
-    it('should have error for sub playlist takes too long to respond with m3u8 but have rest of resources custom onError', function() {
-      nock(TEST_URL)
-        .get('/test.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
-        .get('/var256000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
-        .get('/var386000/playlist.m3u8')
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
-        .get('/var500000/playlist.m3u8')
-        .delayConnection(100)
-        .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
-
-      const errors = [];
-      const options = {
-        decrypt: false,
-        basedir: '.',
-        uri: TEST_URL + '/test.m3u8',
-        onError: customError(errors),
-        requestRetryMaxAttempts: 0,
-        requestTimeout: 10,
-        requestRetryDelay: 10
-      };
-
-      return walker(options)
-        .then(function(resources) {
-          const count = countResources({resources, extensions: ['ts', 'm3u8']});
-
-          assert.deepEqual(count, {
-            ts: 16,
-            m3u8: 3,
-            total: 19
+        return walker(options)
+          .catch(function(err) {
+            assert.equal(err.message, 'something awful happened|' + TEST_URL + '/var256000/playlist.m3u8');
           });
-          assert(errors.find(o => o.message === 'ESOCKETTIMEDOUT|' + TEST_URL + '/var500000/playlist.m3u8'));
-          resources.forEach(function(item) {
-            // We shouldn't get the bad manifest
-            assert(item.uri !== TEST_URL + '/var500000/playlist.m3u8');
+      });
+
+      it('should for one sub playlist throwing error should get error but have rest of valid segments/manifests default onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithError('something awful happened')
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+
+        const errors = [];
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          onError: customError(errors),
+          requestRetryMaxAttempts: 0
+        };
+
+        return walker(options)
+          .then(function(resources) {
+            // 3 m3u8 and 8 * 2 segments
+            const setResources = new Set(resources);
+
+            assert.equal(setResources.size, 19);
+
+            assert(errors.find(o => o.message === 'something awful happened|' + TEST_URL + '/var256000/playlist.m3u8'));
+            resources.forEach(function(item) {
+              assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
+              assert(item.uri !== TEST_URL + '/var256000/playlist.m3u8');
+            });
           });
-        });
+      });
+
+      it('should not break if sub playlist is not a valid m3u8', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .reply(200, 'not valid m3u8')
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+
+        const options = {decrypt: false, basedir: '.', uri: TEST_URL + '/test.m3u8', requestRetryMaxAttempts: 0};
+
+        return walker(options)
+          .then(function(resources) {
+            // 4 m3u8 and 8 * 2 segments
+            const setResources = new Set(resources);
+
+            assert.equal(setResources.size, 20);
+            setResources.forEach(function(item) {
+              assert(item.uri.includes('.ts') || item.uri.includes('.m3u8'));
+            });
+            // We should still get the invalid m3u8
+            assert(resources.filter(e => e.uri === TEST_URL + '/var256000/playlist.m3u8').length > 0);
+          });
+      });
+
+      it('should throw top level error if sub playlist takes too long to respond with m3u8 default onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .delayConnection(100)
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          requestRetryMaxAttempts: 0,
+          requestTimeout: 10,
+          requestRetryDelay: 10
+        };
+
+        return walker(options)
+          .catch(function(err) {
+            assert.equal(err.message, 'ESOCKETTIMEDOUT|' + TEST_URL + '/var500000/playlist.m3u8');
+          });
+      });
+
+      it('should have error for sub playlist takes too long to respond with m3u8 but have rest of resources custom onError', function() {
+        nock(TEST_URL)
+          .get('/test.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/var256000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
+          .get('/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/var500000/playlist.m3u8')
+          .delayConnection(100)
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+
+        const errors = [];
+        const options = {
+          decrypt: false,
+          basedir: '.',
+          uri: TEST_URL + '/test.m3u8',
+          onError: customError(errors),
+          requestRetryMaxAttempts: 0,
+          requestTimeout: 10,
+          requestRetryDelay: 10
+        };
+
+        return walker(options)
+          .then(function(resources) {
+            const count = countResources({resources, extensions: ['ts', 'm3u8']});
+
+            assert.deepEqual(count, {
+              ts: 16,
+              m3u8: 3,
+              total: 19
+            });
+            assert(errors.find(o => o.message === 'ESOCKETTIMEDOUT|' + TEST_URL + '/var500000/playlist.m3u8'));
+            resources.forEach(function(item) {
+              // We shouldn't get the bad manifest
+              assert(item.uri !== TEST_URL + '/var500000/playlist.m3u8');
+            });
+          });
+      });
     });
 
     it('should return segments and playlists for mpd', function() {
