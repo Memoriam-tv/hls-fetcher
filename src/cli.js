@@ -17,6 +17,9 @@ const pessimist = require('pessimist')
   .alias('d', 'decrypt')
   .default('d', false)
   .describe('d', 'decrypt and remove enryption from manifest (default: false)')
+  .alias('p', 'prettySave')
+  .default('p', false)
+  .describe('p', 'saves read friendly (default: false)')
   .argv;
 
 // Make output path
@@ -26,7 +29,8 @@ const options = {
   input: pessimist.i,
   output,
   concurrency: pessimist.c,
-  decrypt: pessimist.d
+  decrypt: pessimist.d,
+  prettySave: pessimist.p
 };
 
 start(options).then(function() {

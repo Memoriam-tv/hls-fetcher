@@ -831,6 +831,114 @@ describe('walk-manifest', function() {
           });
         });
     });
+
+    describe('option: prettySave', function() {
+
+      const longPathRandom = 'OYK%40%3F%2BrjKeGaskhhsmf8E7aoUftbIfXZo0ucm9qebBFsXG5yepliwyfwKIf4zTGqMocHsTJePF91V17ZJ4h8A7mS3ysNSOcjKQT2oAVJmfD3vJIwdDfD0mZqlA9jQOOWwXnLy0UQtn9V2eYXlNAdIc9w8yDFPxDp509vJC9lurHWewql6eg22drnACC2rEDOXYit0I3CqOaVRvLSIqG0quUda5CoDn7vmaCBlvsBA0MEoWQSG0TEmDtdTT6DP8vUCC7BTtr9Zaxo5l9QYnWyNMzZNszjijCoKq8LsAi95WIo2n9';
+      const manifestUri = `test.m3u8?token=${longPathRandom}`;
+      const options = {
+        decrypt: false,
+        basedir: '.',
+        uri: `${TEST_URL}/test/${manifestUri}`,
+        requestRetryMaxAttempts: 0
+      };
+
+      beforeEach(() => {
+        nock(TEST_URL)
+          .get(`/test/${manifestUri}`)
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/playlist.m3u8`)
+          .get('/test/var256000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var256000/playlist.m3u8`)
+          .get('/test/var386000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var386000/playlist.m3u8`)
+          .get('/test/var500000/playlist.m3u8')
+          .replyWithFile(200, `${process.cwd()}/test/resources/with-sub-manifest/var500000/playlist.m3u8`);
+      });
+
+      it('when false generate default output', function() {
+        const expected = [
+          'test.m3u8token=OYK@+rjKeGaskhhsmf8E7aoUftbIfXZo0ucm9qebBFsXG5yepliwyfwKIf4zTGqMocHsTJePF91V17ZJ4h8A7mS3ysNSOcjKQT2oAVJmfD3vJIwdDfD0mZqlA9jQOOWwXnLy0UQtn9V2eYXlNAdIc9w8yDFPxDp509vJC9lurHWewql6eg22drnACC2rEDOXYit0I3CqOaVRvLSIqG0quUda5CoDn7vmaCBlvsBA0MEoWQSG',
+          'manifest0/playlist.m3u8',
+          'manifest0/seg0.ts',
+          'manifest0/seg1.ts',
+          'manifest0/seg2.ts',
+          'manifest0/seg3.ts',
+          'manifest0/seg4.ts',
+          'manifest0/seg5.ts',
+          'manifest0/seg6.ts',
+          'manifest0/seg7.ts',
+          'manifest1/playlist.m3u8',
+          'manifest1/seg0.ts',
+          'manifest1/seg1.ts',
+          'manifest1/seg2.ts',
+          'manifest1/seg3.ts',
+          'manifest1/seg4.ts',
+          'manifest1/seg5.ts',
+          'manifest1/seg6.ts',
+          'manifest1/seg7.ts',
+          'manifest2/playlist.m3u8',
+          'manifest2/seg0.ts',
+          'manifest2/seg1.ts',
+          'manifest2/seg2.ts',
+          'manifest2/seg3.ts',
+          'manifest2/seg4.ts',
+          'manifest2/seg5.ts',
+          'manifest2/seg6.ts',
+          'manifest2/seg7.ts'
+        ];
+
+        return walker(options)
+          .then(function(resources) {
+            const actual = resources.map(function(item) {
+              return item.file;
+            });
+
+            assert.deepStrictEqual(actual, expected);
+          });
+      });
+      it('when true generate pretty filenames', function() {
+        const expected = [
+          'master.m3u8',
+          'manifest0_720x576/playlist.m3u8',
+          'manifest0_720x576/seg0.ts',
+          'manifest0_720x576/seg1.ts',
+          'manifest0_720x576/seg2.ts',
+          'manifest0_720x576/seg3.ts',
+          'manifest0_720x576/seg4.ts',
+          'manifest0_720x576/seg5.ts',
+          'manifest0_720x576/seg6.ts',
+          'manifest0_720x576/seg7.ts',
+          'manifest1_720x576/playlist.m3u8',
+          'manifest1_720x576/seg0.ts',
+          'manifest1_720x576/seg1.ts',
+          'manifest1_720x576/seg2.ts',
+          'manifest1_720x576/seg3.ts',
+          'manifest1_720x576/seg4.ts',
+          'manifest1_720x576/seg5.ts',
+          'manifest1_720x576/seg6.ts',
+          'manifest1_720x576/seg7.ts',
+          'manifest2_720x576/playlist.m3u8',
+          'manifest2_720x576/seg0.ts',
+          'manifest2_720x576/seg1.ts',
+          'manifest2_720x576/seg2.ts',
+          'manifest2_720x576/seg3.ts',
+          'manifest2_720x576/seg4.ts',
+          'manifest2_720x576/seg5.ts',
+          'manifest2_720x576/seg6.ts',
+          'manifest2_720x576/seg7.ts'
+        ];
+
+        options.prettySave = true;
+        return walker(options)
+          .then(function(resources) {
+            const actual = resources.map(function(item) {
+              return item.file;
+            });
+
+            assert.deepStrictEqual(actual, expected);
+          });
+      });
+    });
     // end walkPlaylist
   });
 });

@@ -203,7 +203,7 @@ const walkPlaylist = function(options) {
       basedir,
       uri,
       parent = false,
-      manifestIndex = 0,
+      manifestPath = 'manifest',
       onError = function(err, errUri, resources, res, rej) {
         // Avoid adding the top level uri to nested errors
         if (err.message.includes('|')) {
@@ -216,6 +216,7 @@ const walkPlaylist = function(options) {
       requestTimeout = 1500,
       requestRetryMaxAttempts = 5,
       dashPlaylist = null,
+      prettySave = false,
       requestRetryDelay = 5000
     } = options;
 
@@ -223,8 +224,13 @@ const walkPlaylist = function(options) {
     const manifest = {parent};
 
     if (uri) {
+      let masterManifestPath = urlBasename(uri);
+
+      if (prettySave) {
+        masterManifestPath = 'master.m3u8';
+      }
       manifest.uri = uri;
-      manifest.file = path.join(basedir, urlBasename(uri));
+      manifest.file = path.join(basedir, masterManifestPath);
     }
 
     let existingManifest;
@@ -238,7 +244,7 @@ const walkPlaylist = function(options) {
       manifest.file = path.join(
         basedir,
         path.dirname(path.relative(basedir, parent.file)),
-        'manifest' + manifestIndex,
+        manifestPath,
         path.basename(manifest.file)
       );
 
@@ -346,7 +352,15 @@ const walkPlaylist = function(options) {
         });
 
         // SUB Playlists
-        const subs = playlists.map(function(p, z) {
+        const subs = playlists.map(function(p, manifestIndex) {
+          let subManifestPath = 'manifest' + manifestIndex;
+
+          if (prettySave && p && p.attributes && p.attributes.RESOLUTION) {
+            subManifestPath += '_';
+            subManifestPath += p.attributes.RESOLUTION.width;
+            subManifestPath += 'x';
+            subManifestPath += p.attributes.RESOLUTION.height;
+          }
           if (!p.uri && !dash) {
             return Promise.resolve(resources);
           }
@@ -356,7 +370,7 @@ const walkPlaylist = function(options) {
             basedir,
             uri: p.uri,
             parent: manifest,
-            manifestIndex: z,
+            manifestPath: subManifestPath,
             onError,
             visitedUrls,
             requestTimeout,
