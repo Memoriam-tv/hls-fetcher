@@ -19,7 +19,10 @@ const fsSanitize = function(filepath) {
     .join(path.sep);
 };
 
-const urlBasename = function(uri) {
+const urlBasename = function(uri, stripQueryString) {
+  if (stripQueryString) {
+    uri = uri.split('?')[0];
+  }
   const parsed = url.parse(uri);
   const pathname = parsed.pathname || parsed.path.replace(parsed.query || '', '');
   const query = (parsed.query || '').split(/\\\\|\\|\//).join('');
@@ -123,7 +126,7 @@ const parseMpdManifest = function(content, srcUrl) {
   return m3u8Result;
 };
 
-const parseKey = function(requestOptions, basedir, decrypt, resources, manifest, parent) {
+const parseKey = function(requestOptions, basedir, decrypt, resources, manifest, parent, stripQueryString) {
   return new Promise(function(resolve, reject) {
 
     if (!manifest.parsed.segments[0] || !manifest.parsed.segments[0].key) {
@@ -140,7 +143,7 @@ const parseKey = function(requestOptions, basedir, decrypt, resources, manifest,
       if (parent) {
         key.file = path.dirname(parent.file);
       }
-      key.file = path.join(key.file, urlBasename(key.uri));
+      key.file = path.join(key.file, urlBasename(key.uri, stripQueryString));
 
       manifest.content = Buffer.from(manifest.content.toString().replace(
         key.uri,
@@ -217,14 +220,15 @@ const walkPlaylist = function(options) {
       requestRetryMaxAttempts = 5,
       dashPlaylist = null,
       prettySave = false,
-      requestRetryDelay = 5000
+      requestRetryDelay = 5000,
+      stripQueryString = false
     } = options;
 
     let resources = [];
     const manifest = {parent};
 
     if (uri) {
-      let masterManifestPath = urlBasename(uri);
+      let masterManifestPath = urlBasename(uri, stripQueryString);
 
       if (prettySave) {
         masterManifestPath = 'master.m3u8';
@@ -245,7 +249,7 @@ const walkPlaylist = function(options) {
         basedir,
         path.dirname(path.relative(basedir, parent.file)),
         manifestPath,
-        path.basename(manifest.file)
+        urlBasename(manifest.file, stripQueryString)
       );
 
       const file = existingManifest && existingManifest.file || manifest.file;
@@ -325,14 +329,14 @@ const walkPlaylist = function(options) {
         time: requestTimeout,
         maxAttempts: requestRetryMaxAttempts,
         retryDelay: requestRetryDelay
-      }, basedir, decrypt, resources, manifest, parent).then(function(key) {
+      }, basedir, decrypt, resources, manifest, parent, stripQueryString).then(function(key) {
         // SEGMENTS
         manifest.parsed.segments.forEach(function(s, i) {
           if (!s.uri) {
             return;
           }
           // put segments in manifest-name/segment-name.ts
-          s.file = path.join(path.dirname(manifest.file), urlBasename(s.uri));
+          s.file = path.join(path.dirname(manifest.file), urlBasename(s.uri, stripQueryString));
 
           if (manifest.content) {
             manifest.content = Buffer.from(manifest.content.toString().replace(
@@ -374,7 +378,8 @@ const walkPlaylist = function(options) {
             visitedUrls,
             requestTimeout,
             requestRetryMaxAttempts,
-            requestRetryDelay
+            requestRetryDelay,
+            stripQueryString
           });
         });
 

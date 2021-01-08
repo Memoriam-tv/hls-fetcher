@@ -7,7 +7,8 @@ const main = function(options) {
   const settings = {
     decrypt: options.decrypt,
     basedir: options.output,
-    uri: options.input
+    uri: options.input,
+    stripQueryString: options.stripQueryString
   };
 
   return WalkManifest(settings)

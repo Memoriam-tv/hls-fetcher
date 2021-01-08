@@ -20,6 +20,9 @@ const pessimist = require('pessimist')
   .alias('p', 'prettySave')
   .default('p', false)
   .describe('p', 'saves read friendly (default: false)')
+  .alias('s', 'stripQueryString')
+  .default('s', false)
+  .describe('s', 'strip QueryString from filenames (default: false)')
   .argv;
 
 // Make output path
@@ -30,7 +33,8 @@ const options = {
   output,
   concurrency: pessimist.c,
   decrypt: pessimist.d,
-  prettySave: pessimist.p
+  prettySave: pessimist.p,
+  stripQueryString: pessimist.s
 };
 
 start(options).then(function() {
