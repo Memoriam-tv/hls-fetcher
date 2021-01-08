@@ -352,23 +352,22 @@ const walkPlaylist = function(options) {
         });
 
         // SUB Playlists
-        const subs = playlists.map(function(p, manifestIndex) {
+        const subs = playlists.map(function(playlist, manifestIndex) {
           let subManifestPath = 'manifest' + manifestIndex;
 
-          if (prettySave && p && p.attributes && p.attributes.RESOLUTION) {
-            subManifestPath += '_';
-            subManifestPath += p.attributes.RESOLUTION.width;
-            subManifestPath += 'x';
-            subManifestPath += p.attributes.RESOLUTION.height;
+          if (prettySave && playlist && playlist.attributes && playlist.attributes.RESOLUTION) {
+            const {width, height} = playlist.attributes.RESOLUTION;
+
+            subManifestPath = `manifest${manifestIndex}_${width}x${height}`;
           }
-          if (!p.uri && !dash) {
+          if (!playlist.uri && !dash) {
             return Promise.resolve(resources);
           }
           return walkPlaylist({
-            dashPlaylist: dash ? p : null,
+            dashPlaylist: dash ? playlist : null,
             decrypt,
             basedir,
-            uri: p.uri,
+            uri: playlist.uri,
             parent: manifest,
             manifestPath: subManifestPath,
             onError,
