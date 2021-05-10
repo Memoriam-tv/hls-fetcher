@@ -46,7 +46,7 @@
     "conventional-changelog-videojs": "^3.0.0",
     "doctoc": "^2.0.0",
     "husky": "^4.3.7",
-    "lint-staged": "^10.5.3",
+    "lint-staged": "^11.0.0",
     "mocha": "^5.2.0",
     "nock": "^13.0.4",
     "not-prerelease": "^1.0.1",
