@@ -39,7 +39,7 @@
     "mpd-parser": "^0.16.0",
     "pessimist": "^0.3.5",
     "request": "^2.87.0",
-    "requestretry": "^5.0.0"
+    "requestretry": "^7.0.0"
   },
   "devDependencies": {
     "conventional-changelog-cli": "^2.1.1",
